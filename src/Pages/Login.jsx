@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../Config/firebaseConfig';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from 'react-router-dom'; // Adicione esta linha
 import { Button, TextField, Container, Typography, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
 const theme = createTheme({
@@ -17,18 +18,19 @@ const theme = createTheme({
 
 const Login = () => {
   const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    
-const handleLogin = async () => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log('User logged in:', userCredential);
-    // Redirecionar para o Dashboard
-    window.location.href = "/dashboard";
-  } catch (error) {
-    console.log('Login error:', error);
-  }
-};
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // Adicione esta linha
+
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('User logged in:', userCredential);
+      // Redirecionar para o Dashboard
+      navigate('/dashboard'); // Adicione esta linha (substitui window.location.href)
+    } catch (error) {
+      console.log('Login error:', error);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>

@@ -1,26 +1,41 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
-import PrivateRoute from './Routes/PrivateRoute';
-
-// Componente para redirecionamento
-const RedirectToLogin = () => {
-  useEffect(() => {
-    window.location.href = '/login';
-  }, []); // O array vazio significa que esse efeito será executado apenas uma vez após o primeiro render.
-
-  return null; // Não renderiza nada, pois o seu único propósito é redirecionar.
-};
+import Link from './Components/Links/Link';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 // Componente principal App
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Use o Firebase para verificar o estado de autenticação do usuário
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // O usuário está autenticado
+        setIsAuthenticated(true);
+      } else {
+        // O usuário não está autenticado
+        setIsAuthenticated(false);
+      }
+    });
+  }, []);
+
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
-        <Route path="/" element={<RedirectToLogin />} /> {/* Redirecionando rotas não correspondidas para /login */}
+        <Route
+          path="/dashboard"
+          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/link"
+          element={isAuthenticated ? <Link /> : <Navigate to="/login" />}
+        />
+        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
   );
